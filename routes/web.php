@@ -16,6 +16,8 @@ Route::get('/sapa/{nama}', function ($nama) {
     return "Halo, $nama! Selamat datang di Toko Online.";
 });
 
-Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/login', [LoginController::class, 'showLoginForm']);
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout']);

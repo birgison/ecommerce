@@ -1,4 +1,5 @@
 <?php
+// database/seeders/CategorySeeder.php
 
 namespace Database\Seeders;
 
@@ -7,10 +8,9 @@ use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
-
     public function run(): void
     {
-         $categories = [
+        $categories = [
             [
                 'name' => 'Elektronik',
                 'slug' => 'elektronik',

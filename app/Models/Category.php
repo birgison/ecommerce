@@ -1,13 +1,15 @@
 <?php
+// app/Models/Category.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
-      use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -21,45 +23,32 @@ class Category extends Model
         'is_active' => 'boolean',
     ];
 
-    // ==================== BOOT METHOD ====================
 
-    /**
-     * Method boot() dipanggil saat model di-initialize.
-     * Kita gunakan untuk auto-generate slug.
-     */
     protected static function boot()
     {
         parent::boot();
 
-        // Event "creating" dipanggil sebelum model disimpan (baru)
+
         static::creating(function ($category) {
             if (empty($category->slug)) {
                 $category->slug = Str::slug($category->name);
             }
         });
 
-        // Event "updating" dipanggil sebelum model diupdate
         static::updating(function ($category) {
-            // Jika nama berubah, update slug juga
             if ($category->isDirty('name')) {
                 $category->slug = Str::slug($category->name);
             }
         });
     }
 
-    // ==================== RELATIONSHIPS ====================
 
-    /**
-     * Kategori memiliki banyak produk.
-     */
     public function products()
     {
         return $this->hasMany(Product::class);
     }
 
-    /**
-     * Hanya produk aktif dan tersedia.
-     */
+
     public function activeProducts()
     {
         return $this->hasMany(Product::class)
@@ -67,12 +56,7 @@ class Category extends Model
                     ->where('stock', '>', 0);
     }
 
-    // ==================== SCOPES ====================
 
-    /**
-     * Scope untuk filter kategori aktif.
-     * Penggunaan: Category::active()->get()
-     */
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -93,5 +77,3 @@ class Category extends Model
         return asset('images/category-placeholder.png');
     }
 }
-
-
