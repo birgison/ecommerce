@@ -1,5 +1,4 @@
 <?php
-// database/migrations/xxxx_create_product_images_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -7,34 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->cascadeOnDelete();
 
-            // Foreign key ke products
-            $table->foreignId('product_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
-
-            // Path file gambar di storage
-            $table->string('image_path');
-
-            // Gambar utama (tampil di listing)
-            $table->boolean('is_primary')->default(false);
-
-            // Urutan tampilan
-            $table->integer('sort_order')->default(0);
+// Session ID untuk guest checkout
+            $table->string('session_id')->nullable();
 
             $table->timestamps();
 
-            // Index untuk query gambar utama
-            $table->index(['product_id', 'is_primary']);
+// Index untuk query cepat
+            $table->index('session_id');
+
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('product_images');
+        Schema::dropIfExists('carts');
     }
 };
