@@ -25,10 +25,10 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price'          => 'decimal:2',
+        'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
-        'is_active'      => 'boolean',
-        'is_featured'    => 'boolean',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
     ];
 
     // ==================== BOOT ====================
@@ -116,7 +116,7 @@ class Product extends Model
      */
     public function getDiscountPercentageAttribute(): int
     {
-        if (! $this->has_discount) {
+        if (!$this->has_discount) {
             return 0;
         }
         return round((($this->price - $this->discount_price) / $this->price) * 100);
@@ -128,7 +128,7 @@ class Product extends Model
     public function getHasDiscountAttribute(): bool
     {
         return $this->discount_price !== null
-        && $this->discount_price < $this->price;
+            && $this->discount_price < $this->price;
     }
 
     /**
@@ -181,7 +181,7 @@ class Product extends Model
      */
     public function scopeByCategory($query, string $categorySlug)
     {
-        return $query->whereHas('category', function ($q) use ($categorySlug) {
+        return $query->whereHas('category', function($q) use ($categorySlug) {
             $q->where('slug', $categorySlug);
         });
     }
@@ -193,7 +193,7 @@ class Product extends Model
     {
         return $query->where(function ($q) use ($keyword) {
             $q->where('name', 'like', "%{$keyword}%")
-                ->orWhere('description', 'like', "%{$keyword}%");
+              ->orWhere('description', 'like', "%{$keyword}%");
         });
     }
 

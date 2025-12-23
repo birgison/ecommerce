@@ -65,8 +65,8 @@ class Category extends Model
     public function activeProducts()
     {
         return $this->hasMany(Product::class)
-            ->where('is_active', true)
-            ->where('stock', '>', 0);
+                    ->where('is_active', true)
+                    ->where('stock', '>', 0);
     }
 
     // ==================== SCOPES ====================

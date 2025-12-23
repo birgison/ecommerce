@@ -11,26 +11,39 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')
+            $table->foreignId('category_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
-// Path file gambar di storage
-            $table->string('image_path');
+// INFORMASI DASAR
+            $table->string('name');
+            $table->string('slug')->unique(); // Slug wajib valid URL dan unik
+            $table->text('description')->nullable();
 
-// Gambar utama (tampil di listing)
-            $table->boolean('is_primary')->default(false);
+// HARGA (PENTING!)
+// MENGAPA DECIMAL? Bukan Float?
+// Float tidak presisi untuk uang (bisa terjadi rounding error).
+// Decimal(12, 2) artinya total 12 digit, dengan 2 digit di belakang koma.
+// Contoh valid: 9,999,999,999.99 (Hingga 9 Milyar)
+            $table->decimal('price', 12, 2);
 
-// Urutan tampilan
-            $table->integer('sort_order')->default(0);
+            $table->decimal('discount_price', 12, 2)->nullable();
+
+// STOK BARANG
+            $table->integer('stock')->default(0);
+
+// BERAT BARANG
+// Penting untuk hitung ongkos kirim (misal via JNE/Tiki)
+// Disimpan dalam gram (integer). 1 kg = 1000.
+            $table->integer('weight')->default(0)->comment('dalam gram');
+
+                                                            // STATUS VISIBILITAS
+            $table->boolean('is_active')->default(true);    // true = tampil di katalog
+            $table->boolean('is_featured')->default(false); // true = tampil di carousel/highlight
 
             $table->timestamps();
-
-// Index untuk query gambar utama
-            $table->index(['product_id', 'is_primary']);
-
         });
     }
 
@@ -39,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_images');
+        Schema::dropIfExists('products');
     }
 };
