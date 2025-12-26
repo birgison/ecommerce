@@ -1,80 +1,131 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{{-- ================================================
+FILE: resources/views/layouts/app.blade.php
+FUNGSI: Master layout untuk halaman customer/publik
+================================================ --}}
 
-    <!-- CSRF Token -->
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{-- CSRF Token untuk AJAX --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    {{-- SEO Meta Tags --}}
+    <title>@yield('title', 'Toko Online') - {{ config('app.name') }}</title>
+    <meta name="description" content="@yield('meta_description', 'Toko online terpercaya dengan produk berkualitas')">
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    {{-- Favicon --}}
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
 
-    <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    {{-- Google Fonts --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    {{-- Vite CSS --}}
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
+
+    @stack('styles')
 </head>
+
 <body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+    {{-- ============================================
+    NAVBAR
+    ============================================ --}}
+    @include('partials.navbar')
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <main class="py-4">
-            @yield('content')
-        </main>
+    
+    <div class="container mt-3">
+        @include('partials.flash-messages')
     </div>
-</body>
-</html>
+
+    {{-- ============================================
+    MAIN CONTENT
+    ============================================ --}}
+    <main class="min-vh-100">
+        @yield('content')
+    </main>
+
+    {{-- ============================================
+    FOOTER
+    ============================================ --}}
+    @include('partials.footer')
+
+    {{-- Stack untuk JS tambahan per halaman --}}
+    @stack('scripts')
+    <script>
+        /**
+       * Fungsi AJAX untuk Toggle Wishlist
+       * Menggunakan Fetch API (Modern JS) daripada jQuery.
+       */
+      async function toggleWishlist(productId) {
+        try {
+          // 1. Ambil CSRF token dari meta tag HTML
+          // Laravale mewajibkan token ini untuk setiap request POST demi keamanan.
+          const token = document.querySelector('meta[name="csrf-token"]').content;
+
+          // 2. Kirim Request ke Server
+          const response = await fetch(`/wishlist/toggle/${productId}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-TOKEN": token, // Tempel token di header
+            },
+          });
+
+          // 3. Handle jika user belum login (Error 401 Unauthorized)
+          if (response.status === 401) {
+            window.location.href = "/login"; // Lempar ke halaman login
+            return;
+          }
+
+          // 4. Baca respon JSON dari server
+          const data = await response.json();
+
+          if (data.status === "success") {
+            // 5. Update UI tanpa reload halaman
+            updateWishlistUI(productId, data.added); // Ganti warna ikon
+            updateWishlistCounter(data.count); // Update angka di header
+            showToast(data.message); // Tampilkan notifikasi
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showToast("Terjadi kesalahan sistem.", "error");
+        }
+      }
+
+      function updateWishlistUI(productId, isAdded) {
+        // Cari semua tombol wishlist untuk produk ini (bisa ada di card & detail page)
+        const buttons = document.querySelectorAll(`.wishlist-btn-${productId}`);
+
+        buttons.forEach((btn) => {
+          const icon = btn.querySelector("i"); // Menggunakan tag <i> untuk Bootstrap Icons
+          if (isAdded) {
+            // Ubah jadi merah solid (Love penuh)
+            icon.classList.remove("bi-heart", "text-secondary");
+            icon.classList.add("bi-heart-fill", "text-danger");
+          } else {
+            // Ubah jadi abu-abu outline (Love kosong)
+            icon.classList.remove("bi-heart-fill", "text-danger");
+            icon.classList.add("bi-heart", "text-secondary");
+          }
+        });
+      }
+
+      function updateWishlistCounter(count) {
+        const badge = document.getElementById("wishlist-count");
+        if (badge) {
+          badge.innerText = count;
+          // Bootstrap badge display toggle logic
+          badge.style.display = count > 0 ? "inline-block" : "none";
+        }
+      }
+    </script>
+    @stack('scripts')
+  </body>
+
+  </html>
