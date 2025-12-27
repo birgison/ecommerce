@@ -38,10 +38,8 @@ FUNGSI: Master layout untuk halaman customer/publik
     ============================================ --}}
     @include('partials.navbar')
 
-    
-    <div class="container mt-3">
-        @include('partials.flash-messages')
-    </div>
+
+
 
     {{-- ============================================
     MAIN CONTENT
@@ -55,7 +53,7 @@ FUNGSI: Master layout untuk halaman customer/publik
     ============================================ --}}
     @include('partials.footer')
 
-    {{-- Stack untuk JS tambahan per halaman --}}
+
     @stack('scripts')
     <script>
         /**
