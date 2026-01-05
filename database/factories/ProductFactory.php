@@ -47,7 +47,15 @@ class ProductFactory extends Factory
             'is_active' => true,
         ]);
     }
-
+    public function onSale(): static
+    {
+        return $this->state(function (array $attributes) {
+            $price = $attributes['price'];
+            return [
+                'discount_price' => (int)($price * fake()->randomFloat(2, 0.5, 0.8)),
+            ];
+        });
+    }
     /**
      * State untuk produk out of stock.
      */

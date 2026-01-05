@@ -25,7 +25,8 @@ FUNGSI: Master layout untuk halaman customer/publik
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- Vite CSS --}}
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+@vite(['resources/css/app.css', 'resources/js/app.js']) {{-- Stack untuk
+    script tambahan dari child view --}} @stack('scripts')
 
 
 

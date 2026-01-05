@@ -38,6 +38,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+       Schema::create('order_items', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('order_id')->constrained()->onDelete('cascade');
+    $table->foreignId('product_id')->constrained();
+
+    // PENTING: Snapshot data produk saat transaksi
+    $table->string('product_name'); // Simpan nama kalau-kalau produk dihapus/diubah
+    $table->integer('quantity');
+    $table->decimal('price', 12, 2); // Simpan harga SAAT transaksi, bukan relasi ke harga produk sekarang
+    $table->decimal('subtotal', 12, 2); // quantity * price
+
+    $table->timestamps();
+});
     }
 };
