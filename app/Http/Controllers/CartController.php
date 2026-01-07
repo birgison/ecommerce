@@ -3,8 +3,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\CartService;
 use App\Models\Product;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -30,7 +30,7 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity'   => 'required|integer|min:1',
         ]);
 
         try {
