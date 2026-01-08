@@ -1,0 +1,72 @@
+/* HERO */
+.hero-premium {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    padding: 90px 0;
+}
+
+.hero-image {
+    max-height: 320px;
+}
+
+/* SECTION */
+.section {
+    padding: 70px 0;
+}
+
+/* CATEGORY */
+.category-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.category-card i {
+    font-size: 28px;
+    color: #0d6efd;
+}
+
+.category-card:hover {
+    transform: translateY(-6px);
+}
+
+/* PRODUCT */
+.product-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    transition: 0.3s;
+}
+
+.product-card img {
+    height: 180px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+}
+
+.price {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+/* PROMO */
+.promo-card {
+    padding: 35px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.promo-yellow {
+    background: linear-gradient(135deg, #ffc107, #ffca2c);
+}
+
+.promo-blue {
+    background: linear-gradient(135deg, #0dcaf0, #0d6efd);
+    color: white;
+}
