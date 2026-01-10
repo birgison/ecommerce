@@ -35,23 +35,25 @@ return new class extends Migration
                 'cancelled',  // Dibatalkan
             ])->default('pending');
 
-// Alamat pengiriman (snapshot saat order)
+            // Alamat pengiriman (snapshot saat order)
             $table->string('shipping_name');
             $table->string('shipping_phone', 20);
             $table->text('shipping_address');
 
-// Metode pembayaran
+            // Metode pembayaran
             $table->string('payment_method')->nullable();
 
-// Catatan dari pembeli
+            // Catatan dari pembeli
             $table->text('notes')->nullable();
 
-            $table->timestamps();
-
-// Index untuk query
+            // Index untuk query
             $table->index('order_number');
             $table->index('status');
             $table->index('created_at');
+
+            $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
+            $table->string('snap_token')->nullable();
+            $table->timestamps();
 
         });
     }
@@ -61,33 +63,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained();
-    $table->string('order_number')->unique(); // ID unik, misal ORD-20231201-001
-
-    // Status Pesanan
-    $table->enum('status', ['pending', 'processing', 'completed', 'cancelled'])->default('pending');
-
-    // Status Pembayaran (PENTING: tambahkan ini)
-    $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
-
-    // Informasi Pengiriman
-    $table->string('shipping_name');
-    $table->string('shipping_address');
-    $table->string('shipping_phone');
-
-    // Total & Biaya
-    $table->decimal('total_amount', 12, 2);
-    $table->decimal('shipping_cost', 12, 2)->default(0);
-
-    // Midtrans Snap Token
-    $table->string('snap_token')->nullable();
-
-    $table->timestamps();
-
-
-
-});
+        Schema::dropIfExists('orders');
     }
 };
